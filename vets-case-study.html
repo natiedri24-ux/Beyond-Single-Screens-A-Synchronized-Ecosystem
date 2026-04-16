@@ -172,15 +172,28 @@ function initAll() {
 }
 
 function reportHeight(){
-  var h = document.body.scrollHeight;
-  try{ window.parent.postMessage({type:'iframeHeight',height:h},'*'); }catch(e){}
+  var h = Math.max(
+    document.body.scrollHeight,
+    document.documentElement.scrollHeight,
+    document.body.offsetHeight,
+    document.documentElement.offsetHeight
+  );
+  try{
+    window.parent.postMessage({type:'iframeHeight', height:h}, '*');
+    window.parent.postMessage(h, '*');
+  }catch(e){}
 }
 var _rt;
 window.addEventListener('resize', function(){
   clearTimeout(_rt);
   _rt = setTimeout(function(){ goTo(curSlide); placeDots(1); placeDots(2); placeDots(3); reportHeight(); }, 120);
 });
-window.addEventListener('load', function(){ setTimeout(reportHeight, 500); });
+window.addEventListener('load', function(){
+  // Wait for images to fully render before measuring
+  setTimeout(reportHeight, 500);
+  setTimeout(reportHeight, 1500);
+  setTimeout(reportHeight, 3000);
+});
 
 </script>
 </head>
